@@ -74,7 +74,7 @@ else
   while git rev-parse HEAD^${PARENT} >/dev/null 2>&1; do
     if [[ "$( git describe --exact-match HEAD^${PARENT} )" =~ ^v([0-9\.]+)$ ]]; then
       # copy packages from ppa:mir-team/rc to ppa:mir-team/release_ppa
-      RELEASE_VERSION=${BASH_REMATCH[1]}-0ubuntu1-${UBUNTU_VERSION}-bot
+      RELEASE_VERSION=${BASH_REMATCH[1]}
       #echo "Copying mir_${RELEASE_VERSION} from ppa:kobuk-team/rc to ppa:mir-team/release…"
       python - ${RELEASE_VERSION} <<EOF
 import os
@@ -128,7 +128,7 @@ EOF
   PKG_VERSION="${PACKAGE_NAME}-${CHANGELOG_VERSION}"
 fi
 
-PPA_VERSION=${PKG_VERSION}-0ubuntu1-${UBUNTU_VERSION}-bot
+PPA_VERSION=${PKG_VERSION}
 
 echo "Setting version to:"
 echo "  ${PPA_VERSION}"
