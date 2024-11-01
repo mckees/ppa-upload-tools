@@ -58,7 +58,7 @@ if [[ "${GIT_BRANCH}" =~ ^(refs/(heads|tags)/)?(release/|v)([0-9\.]+)$ ]]; then
                      2> /dev/null | sed 's/^v//')
     if [ -z "${PATCH_VERSION}" ]; then
       # start with patch version 0
-      MIR_VERSION=${SERIES}.0
+      VERSION=${SERIES}.0
     else
       # increment the patch version
       VERSION=$( echo ${PATCH_VERSION} | perl -pe 's/^((\d+\.)*)(\d+)$/$1.($3+1)/e' )
@@ -74,7 +74,7 @@ else
   while git rev-parse HEAD^${PARENT} >/dev/null 2>&1; do
     if [[ "$( git describe --exact-match HEAD^${PARENT} )" =~ ^v([0-9\.]+)$ ]]; then
       # copy packages from ppa:mir-team/rc to ppa:mir-team/release_ppa
-      RELEASE_VERSION=${BASH_REMATCH[1]}-0ubuntu${UBUNTU_VERSION}
+      RELEASE_VERSION=${BASH_REMATCH[1]}-0ubuntu1-${UBUNTU_VERSION}-bot
       #echo "Copying mir_${RELEASE_VERSION} from ppa:kobuk-team/rc to ppa:mir-team/release…"
       python - ${RELEASE_VERSION} <<EOF
 import os
@@ -123,10 +123,12 @@ EOF
   # upload to dev PPA
   TARGET_PPA=ppa:kobuk-team/testing
   GIT_VERSION=$( git describe | sed 's/^v//' )
-  PKG_VERSION=${GIT_VERSION/-/+dev}
+  PACKAGE_NAME=$(cat debian/changelog | head -1 | awk '{print $1}') 
+  CHANGELOG_VERSION=$(cat debian/changelog | head -1 | grep -oP '(?<=\().*?(?=\))'); echo "${package_name}-${version}"
+  PKG_VERSION="${PACKAGE_NAME}-${CHANGELOG_VERSION}"
 fi
 
-PPA_VERSION=${PKG_VERSION}-0ubuntu${UBUNTU_VERSION}
+PPA_VERSION=${PKG_VERSION}-0ubuntu1-${UBUNTU_VERSION}-bot
 
 echo "Setting version to:"
 echo "  ${PPA_VERSION}"
